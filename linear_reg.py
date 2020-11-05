@@ -51,7 +51,7 @@ class LinearRegression():
         self.bais = 0
         
         for _ in range(self.epochs):
-            predicted_y = np.dot(X, self.weights) + bias
+            predicted_y = np.dot(X, self.weights) + self.bias
             #derivative of weight
             dw =(1/number_samples) * np.dot(X.T , (predicted_y - y))
             # Derivative of bias 
@@ -62,5 +62,5 @@ class LinearRegression():
     
 
     def pred(self, X):
-        predicted_y = np.dot(X, self.weights) + bias
+        predicted_y = np.dot(X, self.weights) + self.bias
         return predicted_y
