@@ -31,16 +31,16 @@ categorical_vars = ['subject_sex',
                     'arrest_made',
                     'citation_issued',
                     'outcome',
-                    'contraband_found',
-                    'contraband_drugs',
-                    'warning_issued',
-                    'contraband_weapons',
-                    'contraband_alcohol',
-                    'contraband_other',
-                    'frisk_performed',
+                    #'contraband_found',
+                    #'contraband_drugs',
+                    #'warning_issued',
+                    #'contraband_weapons',
+                    #'contraband_alcohol',
+                    #'contraband_other',
+                    #'frisk_performed',
                     'search_conducted',
-                    'search_basis',
-                    'reason_for_stop',
+                    #'search_basis',
+                    #'reason_for_stop',
                     'vehicle_type',
                     'vehicle_registration_state',
                     'raw_Race']
@@ -56,8 +56,45 @@ def make_dummies(dataset, dummy_list):
 new_data =make_dummies(data,categorical_vars)
 
 print(new_data.head)
+print(new_data['subject_age'].head)
 
-# Simple linear regression to predict the age of the person stopped by the police 
+# Simple linear regression using sklearn to predict the age of the person stopped 
+""" Define dependent and independent variables"""
+
+X = new_data.drop(['raw_row_number','subject_age'], axis= 1)
+X = X.values.reshape(-1,1)
+print(X.shape)
+median = new_data['subject_age'].median()
+new_data['subject_age'].fillna(median, inplace=True)
+
+Y = new_data['subject_age']
+Y= Y.values.reshape(-1,1)
+print(Y.shape)
+
+
+""" First we need to split the dataset in to test and train and dependent and independent variables"""
+
+# from sklearn.model_selection import train_test_split
+# X_train, X_test, y_train , y_test = train_test_split(X,Y, test_size= 0.25, random_state = 12345)
+# print(X_train.shape)
+# print(X_test.shape)
+# print(y_train.shape)
+# print(y_test.shape)
+
+# X_train = train_data['date']
+# y_train = train_data['subject_age']
+# X_train = X_train.values.reshape(-1, 1)
+# y_train = y_train.values.reshape(-1, 1)
+
+# from sklearn.linear_model import LinearRegression
+# model = LinearRegression()
+# model.fit(X_train,y_train)
+
+
+
+
+
+# Simple linear regression from scratch to predict the age of the person stopped by the police 
 
 
 class LinearRegression():
