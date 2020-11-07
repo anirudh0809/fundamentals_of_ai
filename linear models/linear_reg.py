@@ -11,22 +11,51 @@ print(data.head(10))
 # print(data['subject_age'].isnull().sum())
 
 """ Using linear regression, we want to predict the age of the person who has been stopped"""
-# let us first drop the redundant variables for better computation 
 
-drop_columns = ['']
+# Let us first define the categorical variables
 
-# let us first encode the data. As we have a lot of categories among the variables 
+not_categorical_vars = ['raw_row_number',
+                        'date',
+                        'subject_age']
 
-print(pd.get_dummies(data.subject_sex))
+for categorical in list(data.columns):
+    if categorical not in not_categorical_vars:
+        data[categorical] = data[categorical].astype('category')
 
-values = ['subject_race','subject_sex']
+print(data.info())
+# let us now encode the data. As we have a lot of categories among the variables 
 
-for i in values:
-    print(pd.get_dummies(data[i]))
+categorical_vars = ['subject_sex',
+                    'subject_race',
+                    'type',
+                    'arrest_made',
+                    'citation_issued',
+                    'outcome',
+                    'contraband_found',
+                    'contraband_drugs',
+                    'warning_issued',
+                    'contraband_weapons',
+                    'contraband_alcohol',
+                    'contraband_other',
+                    'frisk_performed',
+                    'search_conducted',
+                    'search_basis',
+                    'reason_for_stop',
+                    'vehicle_type',
+                    'vehicle_registration_state',
+                    'raw_Race']
 
 
+def make_dummies(dataset, dummy_list):
+    for i in dummy_list:
+        dummy = pd.get_dummies(dataset[i], prefix= i, dummy_na= False)
+        dataset = dataset.drop(i,1)
+        dataset = pd.concat([dataset,dummy], axis = 1)
+    return dataset
 
+new_data =make_dummies(data,categorical_vars)
 
+print(new_data.head)
 
 # Simple linear regression to predict the age of the person stopped by the police 
 
@@ -64,3 +93,6 @@ class LinearRegression():
     def pred(self, X):
         predicted_y = np.dot(X, self.weights) + self.bias
         return predicted_y
+
+
+
