@@ -339,10 +339,10 @@ class lin_reg():
 
 regressor = lin_reg()
 regressor.fit(X_train, y_train)
-predicted_vals = regressor.predict(X_test)
+predicted_vals = regressor.pred(X_test)
 
 def mean_sq(y_true, y_predicted):
     np.mean((y_true - y_predicted)** 2)
 
 mse_value = mean_sq(y_test,predicted_vals)
-print(mse_value)    
+print(mse_value)  
