@@ -346,3 +346,36 @@ def mean_sq(y_true, y_predicted):
 
 mse_value = mean_sq(y_test,predicted_vals)
 print(mse_value)  
+
+
+""" Ridge and Lasso regression"""
+from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import ElasticNet
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from math import sqrt
+
+# instantiate ridge regression method
+
+ridge_r = Ridge(alpha= 0.01)
+ridge_r.fit(X_train,y_train)
+train_pred_ridge = ridge_r.predict(X_train)
+print(np.sqrt(mean_squared_error(y_train,train_pred_ridge)))
+print(r2_score(y_test, train_pred_ridge))
+
+# Instantiate lasso regressor method 
+lasso_r = Lasso(alpha=0.01)
+lasso_r.fit(X_train, y_train) 
+pred_train_lasso= lasso_r.predict(X_train)
+print(np.sqrt(mean_squared_error(y_train,pred_train_lasso)))
+print(r2_score(y_train, pred_train_lasso))
+
+pred_test_lasso= model_lasso.predict(X_test)
+print(np.sqrt(mean_squared_error(y_test,pred_test_lasso))) 
+print(r2_score(y_test, pred_test_lasso))
