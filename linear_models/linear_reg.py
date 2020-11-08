@@ -5,6 +5,11 @@ from sklearn.linear_model import LinearRegression
 data = pd.read_csv('/Users/anirudhsharma/FAI/ma_statewide_2020_04_01.csv', low_memory = False)
 print(data.head(10))
 
+# Checking all the nan values and handling them
+print(data.isnull().sum())
+
+
+
 # print(data['search_conducted'].unique())
 # print(data['outcome'].unique())
 
