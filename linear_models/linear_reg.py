@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np 
 from sklearn.linear_model import LinearRegression
 from sklearn.base import TransformerMixin
+import datetime
 
 data = pd.read_csv('/Users/anirudhsharma/FAI/ma_statewide_2020_04_01.csv', low_memory = False)
 print(data.head(10))
@@ -154,6 +155,15 @@ print(df['arrest_made'].unique())
 print(df['citation_issued'].unique())
 print(df['warning_issued'].unique())
 
+# Convert the date into segments for day , date and year 
+
+df['date'] = pd.to_datetime(df['date'])
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+
+print(df['month'].head)
+
 
 class DataFrameImputer(TransformerMixin):
 
@@ -202,6 +212,7 @@ for categorical in list(new_data.columns):
         new_data[categorical] = new_data[categorical].astype('category')
 
 print(new_data.info())
+
 # let us now encode the data. As we have a lot of categories among the variables 
 
 categorical_vars = ['subject_sex',
@@ -210,19 +221,23 @@ categorical_vars = ['subject_sex',
                     'arrest_made',
                     'citation_issued',
                     'outcome',
-                    #'contraband_found',
-                    #'contraband_drugs',
-                    #'warning_issued',
-                    #'contraband_weapons',
-                    #'contraband_alcohol',
-                    #'contraband_other',
-                    #'frisk_performed',
+                    'contraband_found',
+                    'contraband_drugs',
+                    'warning_issued',
+                    'contraband_weapons',
+                    'contraband_alcohol',
+                    'contraband_other',
+                    'frisk_performed',
                     'search_conducted',
-                    #'search_basis',
-                    #'reason_for_stop',
+                    'search_basis',
+                    'reason_for_stop',
                     'vehicle_type',
                     'vehicle_registration_state',
-                    'raw_Race']
+                    'raw_Race',
+                    'race',
+                    'sex',
+                    'outcome_v',
+                    'vehicle']
 
 
 def make_dummies(dataset, dummy_list):
@@ -240,19 +255,13 @@ print(dummy_data['subject_age'].head)
 # Simple linear regression using sklearn to predict the age of the person stopped 
 """ Define dependent and independent variables"""
 
-X = dummy_data.drop(['raw_row_number','subject_age'], axis= 1)
+X = dummy_data.drop(['raw_row_number','subject_age','date','location','county_name'], axis= 1)
 #X = X.values.reshape(-1,1)
-print(X.shape)
-# median = new_data['subject_age'].median()
-# new_data['subject_age'].fillna(median, inplace=True)
 
 Y = dummy_data['subject_age']
-#Y= Y.values.reshape(-1,1)
-print(Y.shape)
-
-
+#
 """ First we need to split the dataset in to test and train and dependent and independent variables"""
-
+print("Before splitting")
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train , y_test = train_test_split(X,Y, test_size= 0.25, random_state = 12345)
 print(X_train.shape)
@@ -260,17 +269,27 @@ print(X_test.shape)
 print(y_train.shape)
 print(y_test.shape)
 
-# X_train = train_data['date']
-# y_train = train_data['subject_age']
-# X_train = X_train.values.reshape(-1, 1)
-# y_train = y_train.values.reshape(-1, 1)
 
+print("Training start")
 from sklearn.linear_model import LinearRegression
 model = LinearRegression()
 model.fit(X_train,y_train)
+print("Trained")
 
+lm_pred = model.predict(X_test)
 
+from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix, mean_squared_error, mean_absolute_error, explained_variance_score
 
+mse = mean_squared_error(y_test, lm_pred)
+mae = mean_absolute_error(y_test, lm_pred)
+evs = explained_variance_score(y_test, lm_pred)
+
+metrics = {"mse":mse,
+           "mae":mae,
+           "evs":evs
+}
+
+print(metrics)
 
 
 # Simple linear regression from scratch to predict the age of the person stopped by the police 
