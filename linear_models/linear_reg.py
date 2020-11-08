@@ -291,28 +291,34 @@ metrics = {"mse":mse,
 
 print(metrics)
 
+# import statsmodels.api as sm
+
+# X_train_new = sm.add_constant(X_train)
+# lm_1 = sm.OLS(y_train, X_train).fit()
+# print(lm_1.summary())
+
 
 # Simple linear regression from scratch to predict the age of the person stopped by the police 
 
 
-class LinearRegression():
+class lin_reg():
     """
     predicts the age of person stopped taking input of 
     the history of the stops
     """
 
-    def __init__(self, learning_rate = 0.0001, epochs = 100):
+    def __init__(self, learning_rate = 0.001, epochs = 100):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
-        self.bais = None
+        self.bias = None
 
     def fit(self,X,y):
         """ Takes in the training samples and labels"""
         # initialize the parameters 
         number_samples , number_features = X.shape
         self.weights = np.zeros(number_features)
-        self.bais = 0
+        self.bias = 0
         
         for _ in range(self.epochs):
             predicted_y = np.dot(X, self.weights) + self.bias
@@ -322,7 +328,7 @@ class LinearRegression():
             db = (1/ number_samples) * np.sum(predicted_y - y)
 
             self.weights -= self.learning_rate * dw
-            self.bais -= self.learning_rate * db
+            self.bias -= self.learning_rate * db
     
 
     def pred(self, X):
@@ -331,3 +337,12 @@ class LinearRegression():
 
 
 
+regressor = lin_reg()
+regressor.fit(X_train, y_train)
+predicted_vals = regressor.predict(X_test)
+
+def mean_sq(y_true, y_predicted):
+    np.mean((y_true - y_predicted)** 2)
+
+mse_value = mean_sq(y_test,predicted_vals)
+print(mse_value)    
