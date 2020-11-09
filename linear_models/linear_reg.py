@@ -291,14 +291,14 @@ metrics = {"mse":mse,
 
 print(metrics)
 
-# import statsmodels.api as sm
+import statsmodels.api as sm
 
-# X_train_new = sm.add_constant(X_train)
-# lm_1 = sm.OLS(y_train, X_train).fit()
-# print(lm_1.summary())
+X_train_new = sm.add_constant(X_train)
+lm_1 = sm.OLS(y_train, X_train).fit()
+print(lm_1.summary())
 
 
-# Simple linear regression from scratch to predict the age of the person stopped by the police 
+#Simple linear regression from scratch to predict the age of the person stopped by the police 
 
 
 class lin_reg():
@@ -367,15 +367,15 @@ ridge_r = Ridge(alpha= 0.01)
 ridge_r.fit(X_train,y_train)
 train_pred_ridge = ridge_r.predict(X_train)
 print(np.sqrt(mean_squared_error(y_train,train_pred_ridge)))
-print(r2_score(y_test, train_pred_ridge))
+#print(r2_score(y_test, train_pred_ridge))
 
 # Instantiate lasso regressor method 
 lasso_r = Lasso(alpha=0.01)
 lasso_r.fit(X_train, y_train) 
 pred_train_lasso= lasso_r.predict(X_train)
 print(np.sqrt(mean_squared_error(y_train,pred_train_lasso)))
-print(r2_score(y_train, pred_train_lasso))
+#print(r2_score(y_train, pred_train_lasso))
 
-pred_test_lasso= model_lasso.predict(X_test)
+pred_test_lasso= lasso_r.predict(X_test)
 print(np.sqrt(mean_squared_error(y_test,pred_test_lasso))) 
-print(r2_score(y_test, pred_test_lasso))
+#print(r2_score(y_test, pred_test_lasso))
