@@ -71,13 +71,51 @@ print('\n New Null values in the columns \n' , data_new.isnull().sum())
 
 #Let us first define the categorical variables
 
-not_categorical_vars = ['raw_row_number',
-                        'date',
-                        'subject_age']
+# not_categorical_vars = ['raw_row_number',
+#                         'date',
+#                         'subject_age']
 
-for categorical in list(data_new.columns):
-    if categorical not in not_categorical_vars:
-        data_new[categorical] = data_new[categorical].astype('category')
+# for categorical in list(data_new.columns):
+#     if categorical not in not_categorical_vars:
+#         data_new[categorical] = data_new[categorical].astype('category')
+categorical_vars = ['subject_sex',
+                        
+                        'type',
+                        'arrest_made',
+                        'citation_issued',
+                        'outcome',
+                        'contraband_found',
+                        'contraband_drugs',
+                        'warning_issued',
+                        'contraband_weapons',
+                        'contraband_alcohol',
+                        'contraband_other',
+                        'frisk_performed',
+                        'search_conducted',
+                        'search_basis',
+                        'reason_for_stop',
+                        'vehicle_type',
+                        'vehicle_registration_state'
+                        
+                        
+                       
+                        ]
+
+
+# def make_dummies(dataset, dummy_list):
+
+
+#     for i in dummy_list:
+
+#         dummy = pd.get_dummies(dataset[i], prefix= i, dummy_na= False)
+#         dataset = dataset.drop(i,1)
+#         dataset = pd.concat([dataset,dummy], axis = 1)
+#     return dataset
+
+# data_new =make_dummies(data_new,categorical_vars)
+
+print(data_new.head)
+print(data_new['subject_age'].head)
 
 print(data_new.info())
 
@@ -90,10 +128,16 @@ data_new['day'] = data_new['date'].dt.day
 columns_to_be_removed = ['location',
                          'county_name',
                          'raw_Race',
-                         'raw_row_number' ]
+                         'raw_row_number' ,
+                         'date']
 
+cleanup_nums = {"subject_race":     {"white": 1, "hispanic": 2, "black": 3, "asian/pacific islander": 4,"other": 5, "unknown": 6}
+                }
+
+data_new.replace(cleanup_nums, inplace=True)
+data_new.head()
 data_new = data_new.drop(columns_to_be_removed,axis = 1)
-
+print(data_new['subject_race'].head)
 print(list(data_new.columns))
 
 
