@@ -1,3 +1,8 @@
+'''
+Created By - Anirudh Sharma
+Implementation - XGBoost 
+'''
+
 import pandas as pd, numpy as np, time
 from sklearn.model_selection import train_test_split
 from feature_engineering import *
@@ -54,8 +59,8 @@ grid_search.fit(train, y_train)
 
 print(grid_search.best_estimator_)
 
-# model = xgb.XGBClassifier(max_depth=50, min_child_weight=1,  n_estimators=200,\
-#                           n_jobs=-1 , verbose=1,learning_rate=0.16)
-# model.fit(train,y_train)
+model = xgb.XGBClassifier(max_depth=50, min_child_weight=1,  n_estimators=200,\
+                          n_jobs=-1 , verbose=1,learning_rate=0.16)
+model.fit(train,y_train)
 
-# auc(model, train, test)
+auc(model, train, test)

@@ -37,20 +37,20 @@ def auc_1(model,train,test):
     return (metrics.roc_auc_score(y_train,model.predict(train)),
             metrics.roc_auc_score(y_test,model.predict(test)))
 
-# light_g = lgb.LGBMClassifier(silent= False)
-# parameter_list = {"max_depth": [25,50, 75],
-#               "learning_rate" : [0.01,0.05,0.1],
-#               "num_leaves": [300,900,1200],
-#               "n_estimators": [200]
-#              }
-# grid_search = GridSearchCV(light_g, n_jobs=-1, param_grid=parameter_list, cv = 3, scoring="roc_auc", verbose=5)
-# grid_search.fit(train,y_train)
-# print(grid_search.best_estimator_)
+light_g = lgb.LGBMClassifier(silent= False)
+parameter_list = {"max_depth": [25,50, 75],
+              "learning_rate" : [0.01,0.05,0.1],
+              "num_leaves": [300,900,1200],
+              "n_estimators": [200]
+             }
+grid_search = GridSearchCV(light_g, n_jobs=-1, param_grid=parameter_list, cv = 3, scoring="roc_auc", verbose=5)
+grid_search.fit(train,y_train)
+print(grid_search.best_estimator_)
 
 
 training_set = lgb.Dataset(train,label = y_train)
 
-# training with categorical features
+training with categorical features
 
 cat_features = ["subject_sex",
                 'type',

@@ -102,17 +102,17 @@ categorical_vars = ['subject_sex',
                         ]
 
 
-# def make_dummies(dataset, dummy_list):
+def make_dummies(dataset, dummy_list):
 
 
-#     for i in dummy_list:
+    for i in dummy_list:
 
-#         dummy = pd.get_dummies(dataset[i], prefix= i, dummy_na= False)
-#         dataset = dataset.drop(i,1)
-#         dataset = pd.concat([dataset,dummy], axis = 1)
-#     return dataset
+        dummy = pd.get_dummies(dataset[i], prefix= i, dummy_na= False)
+        dataset = dataset.drop(i,1)
+        dataset = pd.concat([dataset,dummy], axis = 1)
+    return dataset
 
-# data_new =make_dummies(data_new,categorical_vars)
+data_new =make_dummies(data_new,categorical_vars)
 
 print(data_new.head)
 print(data_new['subject_age'].head)
