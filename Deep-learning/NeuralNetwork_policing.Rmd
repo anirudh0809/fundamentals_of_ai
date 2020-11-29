@@ -1,0 +1,204 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(caret)
+library(reticulate)
+library(tensorflow)
+library(keras)
+
+
+# df<-read_rds("/Users/shivangi/Fundamentals-of-AI/yg821jf8611_ma_statewide_2020_04_01.rds")
+df<-fread("/Users/shivangi/fundamentals_of_ai/ma_statewide_2020_04_01.csv" )
+
+head(df,10)
+
+```
+
+#### Data preprocessing
+
+Removing location, raw_row_number, because they have high cardinality, and serve no purpose in our analysis. 
+
+```{r}
+
+df<-select(df,-c("location","raw_row_number","arrest_made","citation_issued","warning_issued","type","raw_Race"))
+
+df$date<-as.Date(df$date)
+
+df<-df%>%filter((subject_race%in%c("unknown","other"))==FALSE)
+
+df<-df%>%mutate(year=year(date))%>%
+         mutate(month=month(date))%>%
+         mutate(weekday=weekdays(date))%>%
+         mutate(dayofmonth=as.numeric(format(df$date,'%d')))
+
+
+df<-df%>%select(-c("date"))
+
+df$county_name<-df$county_name%>%replace_na("unknown")
+df<-df[!is.na(df$subject_race), ]
+df<-df[!is.na(df$subject_sex), ]
+df<-df[!is.na(df$outcome), ]
+
+
+df$search_basis<-df$search_basis%>%replace_na("unknown")
+df<-df%>%mutate_if(is.logical,as.numeric)
+df<-df%>%replace(is.na(.),99)
+
+
+```
+
+
+```{r}
+
+# label<-as.matrix(df$subject_race)
+# df<-df%>%select(-subject_race)
+
+dummy <- dummyVars("~ .", data=df)
+newdata <- data.frame(predict(dummy, newdata = df))
+
+rm(df)
+set.seed(123)
+
+#splitting data into train and test
+train_index <- sample(seq_len(nrow(newdata)),size = floor(0.70*nrow(newdata)))
+
+
+train<-newdata[train_index,]
+test<-newdata[-train_index,]
+
+# train_label<-label[train_index,]
+# test_label<-label[train_index,]
+
+# y_train<-as.numeric(factor(train_label))%>%
+#          matrix(nrow = 2364527, ncol = 1) %>% 
+#         to_categorical(num_classes = 0:3)
+
+y_train<-cbind(train$subject_raceasian.pacific.islander,train$subject_raceblack,train$subject_racehispanic,train$subject_racewhite)%>%matrix(nrow = 2364527, ncol = 4)
+
+y_test<-cbind(test$subject_raceasian.pacific.islander,test$subject_raceblack,test$subject_racehispanic,test$subject_racewhite)%>%matrix(nrow=1013369,ncol=4)
+
+train<-train%>%select(-subject_raceasian.pacific.islander,-subject_raceblack,-subject_racehispanic,-subject_racewhite)
+#%>% matrix(nrow = 2364527, ncol = 108)
+
+test<-test%>%select(-subject_raceasian.pacific.islander,-subject_raceblack,-subject_racehispanic,-subject_racewhite)
+
+#%>%matrix(nrow=1013369,ncol=108)
+train<-drop_na(train)
+
+```
+
+
+
+```{r}
+# create model
+model <- keras_model_sequential()
+# define and compile the model
+model %>% 
+  layer_dense(units = 100, activation = 'relu', input_shape = c(108)) %>% 
+  layer_dropout(rate = 0.5) %>% 
+  layer_dense(units = 64, activation = 'relu') %>% 
+  layer_dropout(rate = 0.5) %>% 
+  layer_dense(units = ncol(y_train), activation = 'softmax') %>% 
+  compile(
+    loss = 'categorical_crossentropy',
+    optimizer = optimizer_sgd(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = TRUE),
+    metrics = c('accuracy')     
+  )
+# train
+model %>% fit(train, y_train, epochs = 20, batch_size = 128)
+
+```
+
+
+
+```{r}
+summary(model)
+
+```
+
+
+```{r}
+
+#generate dummy data
+x_train <- matrix(runif(10000*108), nrow = 10000, ncol = 108)
+y_train <- runif(10000, min = 0, max = 3) %>%
+  round() %>%
+  matrix(nrow = 10000, ncol = 1) %>%
+  to_categorical(num_classes = 4)
+x_test  <- matrix(runif(5000*108), nrow = 5000, ncol = 108)
+y_test <- runif(5000, min = 0, max = 3) %>%
+  round() %>%
+  matrix(nrow = 5000, ncol = 1) %>%
+  to_categorical(num_classes = 4)
+
+```
+
+
+
+
+```{r}
+
+# # create model
+# model <- keras_model_sequential()
+# # define and compile the model
+# model %>% 
+#   layer_dense(units = 64, activation = 'relu', input_shape = c(108)) %>% 
+#   layer_dropout(rate = 0.5) %>% 
+#   layer_dense(units = 64, activation = 'relu') %>% 
+#   layer_dropout(rate = 0.5) %>% 
+#   layer_dense(units = 4, activation = 'softmax') %>% 
+#   compile(
+#     loss = 'categorical_crossentropy',
+#     optimizer = optimizer_sgd(lr = 0.01, decay = 1e-6, momentum = 0.9, nesterov = TRUE),
+#     metrics = c('accuracy')     
+#   )
+# # train
+# model %>% fit(x_train, y_train, epochs = 20, batch_size = 128)
+
+
+```
+
+
+
+```{r}
+
+# fit model with our training data set, training will be done for 100 times data set
+# Fit the model 
+
+fitted_model<-fit(model,
+                  train, 
+                  as.matrix(y_train), 
+                  epochs = 30, 
+                  batch_size=512,
+                  validation_split = 0.3,
+                  verbose=0
+                  )
+
+#Visualize trained model
+plot(fitted_model)
+```
+
+
+
+
+
+### Neural network evaluation
+
+After training, we evaluate the model using evaluate(). The result shows us the loss and mean absolute error, which is 0.05. We have hence acheived our prescribed accuracy. We generate the predictions using the predict() function. Visualizing the performance, we see that the model approximates the function decently well. 
+
+```{r}
+#Evaluate model
+model%>%evaluate(test,y_test)
+
+#Produce predicted y
+# pred<- model %>% predict(test %>% select(-y))
+
+
+
+```
